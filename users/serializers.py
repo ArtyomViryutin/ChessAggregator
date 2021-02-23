@@ -24,7 +24,7 @@ class CustomUserCreateSerializer(UserCreateSerializer):
     profile = ProfileSerializer()
 
     class Meta(UserCreateSerializer.Meta):
-        fields = ['id', 'email', 'profile', 'password']
+        fields = ['id', 'email', 'is_organizer', 'profile', 'password']
 
     def validate(self, attrs):
         return attrs
