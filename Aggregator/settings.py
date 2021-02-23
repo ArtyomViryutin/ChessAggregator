@@ -139,11 +139,13 @@ DJOSER = {
     'ACTIVATION_URL': 'api/v1/auth/users/activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': False,  # True
     'SEND_CONFIRMATION_EMAIL': False,
-    'SERIALIZERS': {},
+    'SERIALIZERS': {
+        # 'user_create': 'users.serializers.UserSerializer'
+    },
     # 'USER_ID_FIELD': '',
     'LOGIN_FIELD': 'email',
     'USER_CREATE_PASSWORD_RETYPE': False,
-    'SET_USERNAME_RETYPE': True,
+    'SET_USERNAME_RETYPE': False,
     'USERNAME_RESET_CONFIRM_RETYPE': False,
     'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': [],
     'HIDE_USERS': True,

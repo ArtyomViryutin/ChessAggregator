@@ -1,5 +1,5 @@
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
-                                        PermissionsMixin)
+                                        PermissionsMixin, AbstractUser)
 from django.core import validators
 from django.db import models, transaction
 
@@ -26,34 +26,20 @@ class UserManager(BaseUserManager):
         return self._create_user(email=email, password=password, **extra_fields)
 
 
+class SexChoices(models.Choices):
+    MAN = 'Мужчина'
+    WOMAN = 'Женщина'
+
+
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(validators=[validators.validate_email],
                               max_length=40, unique=True, blank=False)
     name = models.CharField(max_length=30, blank=False, null=False)
     surname = models.CharField(max_length=30, blank=False, null=False)
     birthdate = models.DateField(blank=False, null=False)
-
-    is_organizer = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-
     patronymic = models.CharField(max_length=30, blank=True, null=True)
     latin_name = models.CharField(max_length=60, blank=True, null=True, verbose_name='Latin name')
-
-    objects = UserManager()
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name', 'surname', 'patronymic', 'sex', 'birthdate', 'latin_name', 'fide_id', 'frc_id',
-                       'is_organizer', 'fide_id', 'frc_id', 'classic_fide_rating', 'rapid_fide_rating',
-                       'blitz_fide_rating', 'classic_frc_rating', 'rapid_frc_rating', 'blitz_frc_rating', 'latin_name']
-    # REQUIRED_FIELDS = ['birthdate']
-    MAN = 'Мужчина'
-    WOMAN = 'Женщина'
-    SEX_OPTIONS = (
-        (MAN, 'Мужчина'),
-        (WOMAN, 'Женщина'))
-    sex = models.CharField(max_length=7, blank=False, choices=SEX_OPTIONS)
-
+    sex = models.CharField(max_length=7, choices=SexChoices.choices, default=SexChoices.MAN)
     fide_id = models.IntegerField(blank=True, null=True, verbose_name='FIDE ID')
     frc_id = models.IntegerField(blank=True, null=True, verbose_name='FRC ID')
     classic_fide_rating = models.IntegerField(blank=True, null=True, verbose_name='Classic')
@@ -62,6 +48,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     classic_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Classic')
     rapid_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Rapid')
     blitz_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Blitz')
+    is_organizer = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['name', 'surname', 'patronymic', 'sex', 'birthdate', 'latin_name', 'fide_id', 'frc_id',
+                       'is_organizer', 'fide_id', 'frc_id', 'classic_fide_rating', 'rapid_fide_rating',
+                       'blitz_fide_rating', 'classic_frc_rating', 'rapid_frc_rating', 'blitz_frc_rating', 'latin_name']
+    # REQUIRED_FIELDS = ['birthdate']
 
     def __str__(self):
         return self.email
@@ -69,4 +66,3 @@ class User(AbstractBaseUser, PermissionsMixin):
     def save(self, *args, **kwargs):
         super(User, self).save(*args, **kwargs)
         return self
-
