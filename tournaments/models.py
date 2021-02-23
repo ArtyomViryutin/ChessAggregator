@@ -16,12 +16,12 @@ class Tournament(models.Model):
     open_date = models.DateField()
     close_date = models.DateField()
 
-    fee = models.IntegerField(validators=[validators.MinValueValidator(0)])
-    increment = models.IntegerField(validators=[validators.MinValueValidator(0)])
-    prize_fund = models.IntegerField(validators=[validators.MinValueValidator(0)])
-    minutes = models.IntegerField(validators=[validators.MinValueValidator(0)])
-    seconds = models.IntegerField(validators=[validators.MinValueValidator(0)])
-    tours = models.IntegerField(validators=[validators.MinValueValidator(0)])
+    fee = models.IntegerField()
+    increment = models.IntegerField()
+    prize_fund = models.IntegerField()
+    minutes = models.IntegerField()
+    seconds = models.IntegerField()
+    tours = models.IntegerField()
 
     CURRENT = 'current'
     FORTHCOMING = 'forthcoming'
@@ -78,9 +78,32 @@ class Participation(models.Model):
 
 
 class AnonymousParticipation(models.Model):
+    email = models.EmailField(validators=[validators.validate_email],
+                              max_length=40, unique=True, blank=False)
     name = models.CharField(max_length=30, blank=False, null=False)
     surname = models.CharField(max_length=30, blank=False, null=False)
-    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='anonymous_participants')
+    birthdate = models.DateField(blank=False, null=False)
+    patronymic = models.CharField(max_length=30, blank=True, null=True)
+    latin_name = models.CharField(max_length=60, blank=True, null=True, verbose_name='Latin name')
 
+    MAN = 'Мужчина'
+    WOMAN = 'Женщина'
+    SEX_OPTIONS = (
+        (MAN, 'Мужчина'),
+        (WOMAN, 'Женщина'))
+    sex = models.CharField(max_length=7, blank=False, choices=SEX_OPTIONS)
+    fide_id = models.IntegerField(blank=True, null=True, verbose_name='FIDE ID')
+    frc_id = models.IntegerField(blank=True, null=True, verbose_name='FRC ID')
+    classic_fide_rating = models.IntegerField(blank=True, null=True, verbose_name='Classic')
+    rapid_fide_rating = models.IntegerField(blank=True, null=True, verbose_name='Rapid')
+    blitz_fide_rating = models.IntegerField(blank=True, null=True, verbose_name='Blitz')
+    classic_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Classic')
+    rapid_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Rapid')
+    blitz_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Blitz')
+
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='anonymous_participants')
     status = models.CharField(max_length=8, choices=ParticipationOptionChoices.choices,
                               default=ParticipationOptionChoices.WAITING)
+
+
+
