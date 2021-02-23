@@ -8,11 +8,11 @@ class TournamentAdmin(admin.ModelAdmin):
 
 
 class ParticipationAdmin(admin.ModelAdmin):
-    list_display = ('player', 'id')
+    list_display = ('id', 'player', 'tournament', 'status')
 
 
 class AnonymousParticipationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'surname')
+    list_display = ('id', 'email')
 
 
 admin.site.register(Tournament, TournamentAdmin)
