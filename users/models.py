@@ -55,10 +55,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name', 'surname', 'patronymic', 'sex', 'birthdate', 'latin_name', 'fide_id', 'frc_id',
-                       'is_organizer', 'fide_id', 'frc_id', 'classic_fide_rating', 'rapid_fide_rating',
-                       'blitz_fide_rating', 'classic_frc_rating', 'rapid_frc_rating', 'blitz_frc_rating', 'latin_name']
-    # REQUIRED_FIELDS = ['birthdate']
+    # REQUIRED_FIELDS = ['name', 'surname', 'patronymic', 'sex', 'birthdate', 'latin_name', 'fide_id', 'frc_id',
+    #                    'is_organizer', 'fide_id', 'frc_id', 'classic_fide_rating', 'rapid_fide_rating',
+    #                    'blitz_fide_rating', 'classic_frc_rating', 'rapid_frc_rating', 'blitz_frc_rating', 'latin_name']
+    REQUIRED_FIELDS = ['birthdate']
 
     def __str__(self):
         return self.email
