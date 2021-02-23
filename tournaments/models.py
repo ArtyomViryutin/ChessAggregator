@@ -1,7 +1,9 @@
 from django.core import validators
 from django.db import models
 
-from users.models import User, SexChoices
+from users.models import User
+
+from users.models import Profile
 
 
 class Tournament(models.Model):
@@ -45,6 +47,7 @@ class Tournament(models.Model):
                                    RatingTypeChoices.WITHOUT)
 
 
+
 class ParticipationChoices(models.TextChoices):
     WAITING = 'waiting'
     ACCEPTED = 'accepted'
@@ -64,23 +67,8 @@ class Participation(models.Model):
 
 class AnonymousParticipation(models.Model):
     email = models.EmailField(validators=[validators.validate_email],
-                              max_length=40, unique=True)
-    name = models.CharField(max_length=30, blank=False, null=False)
-    surname = models.CharField(max_length=30, blank=False, null=False)
-    birthdate = models.DateField(blank=False, null=False)
-
-    patronymic = models.CharField(max_length=30, blank=True, null=True)
-    latin_name = models.CharField(max_length=60, blank=True, null=True, verbose_name='Latin name')
-
-    sex = models.CharField(max_length=7, choices=SexChoices.choices, default=SexChoices.MAN)
-    fide_id = models.IntegerField(blank=True, null=True, verbose_name='FIDE ID')
-    frc_id = models.IntegerField(blank=True, null=True, verbose_name='FRC ID')
-    classic_fide_rating = models.IntegerField(blank=True, null=True, verbose_name='Classic')
-    rapid_fide_rating = models.IntegerField(blank=True, null=True, verbose_name='Rapid')
-    blitz_fide_rating = models.IntegerField(blank=True, null=True, verbose_name='Blitz')
-    classic_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Classic')
-    rapid_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Rapid')
-    blitz_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Blitz')
+                              max_length=40, null=True, blank=True)
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
 
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='anonymous_participants')
     status = models.CharField(max_length=8, choices=ParticipationChoices.choices,

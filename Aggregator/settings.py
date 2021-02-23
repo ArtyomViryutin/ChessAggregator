@@ -133,6 +133,8 @@ AUTH_USER_MODEL = 'users.User'
 # EMAIL_PORT=587
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
+from django.conf import settings
+
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': 'api/v1/auth/users/password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': 'api/v1/auth/users/username/reset/confirm/{uid}/{token}',
@@ -140,7 +142,9 @@ DJOSER = {
     'SEND_ACTIVATION_EMAIL': False,  # True
     'SEND_CONFIRMATION_EMAIL': False,
     'SERIALIZERS': {
-        # 'user_create': 'users.serializers.UserSerializer'
+        'user_create': 'users.serializers.CustomUserCreateSerializer',
+        'current_user': 'users.serializers.CustomUserSerializer',
+        'user': 'users.serializers.CustomUserSerializer',
     },
     # 'USER_ID_FIELD': '',
     'LOGIN_FIELD': 'email',

@@ -3,6 +3,30 @@ from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
 from django.core import validators
 from django.db import models, transaction
 
+from .parse import parse
+
+
+class SexChoices(models.Choices):
+    MAN = 'Мужчина'
+    WOMAN = 'Женщина'
+
+
+class Profile(models.Model):
+    name = models.CharField(max_length=30, blank=False, null=False)
+    surname = models.CharField(max_length=30, blank=False, null=False)
+    birthdate = models.DateField(blank=True, null=True)
+    patronymic = models.CharField(max_length=30, blank=True, null=True)
+    latin_name = models.CharField(max_length=60, blank=True, null=True, verbose_name='Latin name')
+    sex = models.CharField(max_length=7, choices=SexChoices.choices, default=SexChoices.MAN)
+    fide_id = models.IntegerField(blank=True, null=True, verbose_name='FIDE ID')
+    frc_id = models.IntegerField(blank=True, null=True, verbose_name='FRC ID')
+    classic_fide_rating = models.IntegerField(blank=True, null=True, verbose_name='Classic')
+    rapid_fide_rating = models.IntegerField(blank=True, null=True, verbose_name='Rapid')
+    blitz_fide_rating = models.IntegerField(blank=True, null=True, verbose_name='Blitz')
+    classic_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Classic')
+    rapid_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Rapid')
+    blitz_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Blitz')
+
 
 class UserManager(BaseUserManager):
 
@@ -10,7 +34,14 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('The given email must be set')
         with transaction.atomic():
-            user = self.model(email=email, **extra_fields)
+            profile_data = extra_fields.pop('profile', {})
+            fide_id = profile_data.pop('fide_id', None)
+            frc_id = profile_data.pop('frc_id', None)
+            if fide_id or frc_id:
+                ratings = parse(frc_id=frc_id, fide_id=fide_id)
+                profile_data.update(ratings)
+            profile = Profile.objects.create(**profile_data)
+            user = self.model(email=email, profile=profile, **extra_fields)
             user.set_password(password)
             user.save(using=self._db)
             return user
@@ -26,28 +57,10 @@ class UserManager(BaseUserManager):
         return self._create_user(email=email, password=password, **extra_fields)
 
 
-class SexChoices(models.Choices):
-    MAN = 'Мужчина'
-    WOMAN = 'Женщина'
-
-
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(validators=[validators.validate_email],
                               max_length=40, unique=True, blank=False)
-    name = models.CharField(max_length=30, blank=False, null=False)
-    surname = models.CharField(max_length=30, blank=False, null=False)
-    birthdate = models.DateField(blank=False, null=False)
-    patronymic = models.CharField(max_length=30, blank=True, null=True)
-    latin_name = models.CharField(max_length=60, blank=True, null=True, verbose_name='Latin name')
-    sex = models.CharField(max_length=7, choices=SexChoices.choices, default=SexChoices.MAN)
-    fide_id = models.IntegerField(blank=True, null=True, verbose_name='FIDE ID')
-    frc_id = models.IntegerField(blank=True, null=True, verbose_name='FRC ID')
-    classic_fide_rating = models.IntegerField(blank=True, null=True, verbose_name='Classic')
-    rapid_fide_rating = models.IntegerField(blank=True, null=True, verbose_name='Rapid')
-    blitz_fide_rating = models.IntegerField(blank=True, null=True, verbose_name='Blitz')
-    classic_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Classic')
-    rapid_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Rapid')
-    blitz_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Blitz')
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
     is_organizer = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -55,10 +68,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name', 'surname', 'patronymic', 'sex', 'birthdate', 'latin_name', 'fide_id', 'frc_id',
-                       'is_organizer', 'fide_id', 'frc_id', 'classic_fide_rating', 'rapid_fide_rating',
-                       'blitz_fide_rating', 'classic_frc_rating', 'rapid_frc_rating', 'blitz_frc_rating', 'latin_name']
-    # REQUIRED_FIELDS = ['birthdate']
 
     def __str__(self):
         return self.email

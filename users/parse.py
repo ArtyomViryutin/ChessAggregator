@@ -56,7 +56,6 @@ def parse(frc_id=None, fide_id=None):
     fide_url = 'https://ratings.fide.com/profile/'
     player = {
         'latin_name': None,
-        'latin_surname': None,
         'frc_id': frc_id,
         'fide_id': fide_id,
         'classic_frc_rating': None,
