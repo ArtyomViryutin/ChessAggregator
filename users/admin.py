@@ -4,7 +4,7 @@ from .models import User, Profile
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('id', 'email')
+    list_display = ('id', 'email', 'is_organizer', 'profile')
 
 
 class ProfileAdmin(admin.ModelAdmin):

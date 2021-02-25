@@ -1,7 +1,5 @@
-from djoser.serializers import UserSerializer
 from rest_framework import serializers
-
-from datetime import datetime
+from users.serializers import CustomUserSerializer
 from .models import Participation, Tournament, AnonymousParticipation
 from users.serializers import ProfileSerializer
 
@@ -20,6 +18,13 @@ class AnonymousParticipationSerializer(serializers.ModelSerializer):
         profile = profile_serializer.save()
         return AnonymousParticipation.objects.create(profile=profile, **validated_data)
 
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop('profile', {})
+        profile = ProfileSerializer(instance=instance.profile, data=profile_data, partial=True)
+        profile.is_valid(raise_exception=True)
+        profile.save()
+        return super(AnonymousParticipationSerializer, self).update(instance, validated_data)
+
 
 class TournamentSerializer(serializers.ModelSerializer):
     organizer = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -28,14 +33,12 @@ class TournamentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tournament
-        # fields = '__all__'
         exclude = ['participants']
 
 
 class ParticipationSerializer(serializers.ModelSerializer):
-    player = UserSerializer(read_only=True)
-    tournament = serializers.PrimaryKeyRelatedField(read_only=True)
+    player = CustomUserSerializer(read_only=True)
 
     class Meta:
         model = Participation
-        fields = '__all__'
+        fields = ['status', 'player']

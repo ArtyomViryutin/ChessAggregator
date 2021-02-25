@@ -11,7 +11,12 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import environ
 from datetime import timedelta
+
+root = environ.Path(__file__) - 3  # get root of the project
+env = environ.Env()
+environ.Env.read_env()  # reading .env file
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,10 +27,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = '40(!we^o%)=9^t%gu3ex09s&!2)gg!$nz1+v+fgsq0ot0lil#d'
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '40(!we^o%)=9^t%gu3ex09s&!2)gg!$nz1+v+fgsq0ot0lil#d')
+SECRET_KEY = env.str('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
-DEBUG = bool(os.environ.get('DJANGO_DEBUG', True))
+DEBUG = env.bool('DEBUG', default=False)
+
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -132,8 +138,7 @@ AUTH_USER_MODEL = 'users.User'
 # EMAIL_HOST_PASSWORD='Artyom181!'
 # EMAIL_PORT=587
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
-from django.conf import settings
+# from django.conf import settings
 
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': 'api/v1/auth/users/password/reset/confirm/{uid}/{token}',

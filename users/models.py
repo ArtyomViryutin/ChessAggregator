@@ -27,6 +27,9 @@ class Profile(models.Model):
     rapid_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Rapid')
     blitz_frc_rating = models.IntegerField(blank=True, null=True, verbose_name='Blitz')
 
+    def __str__(self):
+        return self.name + ' ' + self.surname
+
 
 class UserManager(BaseUserManager):
 

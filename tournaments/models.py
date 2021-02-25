@@ -46,6 +46,8 @@ class Tournament(models.Model):
     rating_type = models.CharField(max_length=11, choices=RatingTypeChoices.choices, default=
                                    RatingTypeChoices.WITHOUT)
 
+    def __str__(self):
+        return self.name
 
 
 class ParticipationChoices(models.TextChoices):
@@ -67,11 +69,10 @@ class Participation(models.Model):
 
 class AnonymousParticipation(models.Model):
     email = models.EmailField(validators=[validators.validate_email],
-                              max_length=40, null=True, blank=True)
+                              max_length=40, unique=True)
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
 
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='anonymous_participants')
     status = models.CharField(max_length=8, choices=ParticipationChoices.choices,
                               default=ParticipationChoices.WAITING)
-
 
