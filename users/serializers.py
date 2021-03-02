@@ -9,15 +9,23 @@ from .parse import parse
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = '__all__'
+        exclude = ['id']
+
+    def create(self, validated_data):
+        validated_data = self.get_ratings(validated_data)
+        return super().create(validated_data)
 
     def update(self, instance, validated_data):
+        validated_data = self.get_ratings(validated_data)
+        return super().update(instance, validated_data)
+
+    def get_ratings(self, validated_data):
         fide_id = validated_data.pop('fide_id', None)
         frc_id = validated_data.pop('frc_id', None)
         if fide_id or frc_id:
             ratings = parse(frc_id=frc_id, fide_id=fide_id)
             validated_data.update(ratings)
-        return super().update(instance, validated_data)
+        return validated_data
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):

@@ -3,6 +3,9 @@ from users.serializers import CustomUserSerializer
 from .models import Participation, Tournament, AnonymousParticipation
 from users.serializers import ProfileSerializer
 
+from django.forms.models import model_to_dict
+from users.models import User
+
 
 class AnonymousParticipationSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer()
@@ -28,8 +31,6 @@ class AnonymousParticipationSerializer(serializers.ModelSerializer):
 
 class TournamentSerializer(serializers.ModelSerializer):
     organizer = serializers.PrimaryKeyRelatedField(read_only=True)
-    # participants = serializers.PrimaryKeyRelatedField(read_only=True, many=True)
-    # anonymous_participants = AnonymousParticipationSerializer(read_only=True, many=True)
 
     class Meta:
         model = Tournament
@@ -37,8 +38,28 @@ class TournamentSerializer(serializers.ModelSerializer):
 
 
 class ParticipationSerializer(serializers.ModelSerializer):
-    player = CustomUserSerializer(read_only=True)
+    user = CustomUserSerializer(read_only=True)
 
     class Meta:
         model = Participation
-        fields = ['status', 'player']
+        fields = ['status', 'user']
+
+    def to_representation(self, instance):
+        participation = model_to_dict(instance)
+        participation.pop('tournament')
+        participation.pop('id')
+        uid = participation.pop('user')
+        user = CustomUserSerializer(User.objects.get(id=uid))
+        participation.update(user.data)
+        return participation
+
+    def validate(self, data):
+        if self.context['request'].method == 'PATCH':
+            return data
+        user = self.context['request'].user
+        tid = self.context['request'].parser_context.get('kwargs').get('tid')
+        if Participation.objects.filter(user=user, tournament_id=tid):
+            raise serializers.ValidationError({
+                'detail': f'User {user} already participate in this tournament'
+            })
+        return data

@@ -8,7 +8,7 @@ class TournamentAdmin(admin.ModelAdmin):
 
 
 class ParticipationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'player', 'tournament', 'status')
+    list_display = ('user', 'tournament', 'status')
 
 
 class AnonymousParticipationAdmin(admin.ModelAdmin):

@@ -57,14 +57,13 @@ class ParticipationChoices(models.TextChoices):
 
 
 class Participation(models.Model):
-    player = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
-
     status = models.CharField(max_length=8, choices=ParticipationChoices.choices,
                               default=ParticipationChoices.WAITING)
 
     class Meta:
-        unique_together = ('player', 'tournament')
+        unique_together = ('user', 'tournament')
 
 
 class AnonymousParticipation(models.Model):
