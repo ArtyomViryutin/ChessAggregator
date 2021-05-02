@@ -132,14 +132,6 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'users.User'
 
-# EMAIL_USE_TLS=True
-# EMAIL_HOST='smtp.gmail.com'
-# EMAIL_HOST_USER='chessaggregator@gmail.com'
-# EMAIL_HOST_PASSWORD='Artyom181!'
-# EMAIL_PORT=587
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# from django.conf import settings
-
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': 'api/v1/auth/users/password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': 'api/v1/auth/users/username/reset/confirm/{uid}/{token}',
