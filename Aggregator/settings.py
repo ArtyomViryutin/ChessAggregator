@@ -11,12 +11,9 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
-import environ
 from datetime import timedelta
+import django_heroku
 
-root = environ.Path(__file__) - 3  # get root of the project
-env = environ.Env()
-environ.Env.read_env()  # reading .env file
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,9 +34,6 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'api',
-    'users',
-    'tournaments',
     'djoser',
     'rest_framework',
     'django_filters',
@@ -49,7 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_extensions'
+    'django_extensions',
+    'drf_yasg',
+    'api',
+    'users',
+    'tournaments',
 ]
 
 MIDDLEWARE = [
@@ -187,8 +185,6 @@ SIMPLE_JWT = {
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
-import django_heroku
-import dj_database_url
 django_heroku.settings(locals())
 
 
